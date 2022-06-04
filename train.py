@@ -164,6 +164,8 @@ if __name__ == '__main__' :
             total_images += 1
         test_txt.close()
 
+        print("recog-accuracy = ", corrects/total_images)
+
     #save the model   
     if pargs.save :
         saved_to = os.path.join(configuration.get_data_dir(),"cnn-model")
