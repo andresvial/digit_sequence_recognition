@@ -121,12 +121,15 @@ if __name__ == '__main__' :
             image = tf.expand_dims(image, 0)        
             pred = model.predict(image)
             pred = pred[0][0]
+            total_amount = ""
             for p in pred:
                 #softmax to estimate probs
                 p = np.exp(p - max(p))
                 p = p / np.sum(p)            
                 cla = np.argmax(p)
+                total_amount += str(cla)
                 print('{} [{}]'.format(cla, p[cla]))
+            print('Total amount {}'.format(total_amount))
             filename = input('file :')
 
     #save the model   
