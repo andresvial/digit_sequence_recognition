@@ -43,7 +43,7 @@ if __name__ == '__main__' :
     parser = argparse.ArgumentParser(description = "Train a simple mnist model")
     parser.add_argument("-config", type = str, help = "<str> configuration file", required = True)
     parser.add_argument("-name", type=str, help=" name of section in the configuration file", required = True)
-    parser.add_argument("-mode", type=str, choices=['train', 'test', 'predict'],  help=" train or test or predict", required = False, default = 'train')
+    parser.add_argument("-mode", type=str, choices=['train', 'test', 'predict', 'accuracy'],  help=" train or test or predict", required = False, default = 'train')
     parser.add_argument("-save", type= bool,  help=" True to save the model", required = False, default = False)  
     pargs = parser.parse_args()     
     configuration_file = pargs.config
@@ -140,7 +140,7 @@ if __name__ == '__main__' :
         total_images = 0.0
         corrects = 0.0
 
-        train_txt = open("train.txt", "r")
+        train_txt = open("/content/data/dataset/train.txt", "r")
         lines = train_txt.readlines()
         for line in lines:
             l = line.split("\t")
@@ -152,12 +152,12 @@ if __name__ == '__main__' :
             total_images += 1
         train_txt.close()
 
-        test_txt = open("test.txt", "r")
+        test_txt = open("/content/data/dataset/test.txt", "r")
         lines = test_txt.readlines()
         for line in lines:
             l = line.split("\t")
             filename = l[0]
-            real_amount = l[1]
+            real_amount = l[1].strip()
             predicted_amount = predict_amount(filename)
             if (real_amount == predicted_amount) :
                 corrects += 1
