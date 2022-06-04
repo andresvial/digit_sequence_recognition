@@ -44,7 +44,8 @@ if __name__ == '__main__' :
     parser.add_argument("-config", type = str, help = "<str> configuration file", required = True)
     parser.add_argument("-name", type=str, help=" name of section in the configuration file", required = True)
     parser.add_argument("-mode", type=str, choices=['train', 'test', 'predict', 'accuracy'],  help=" train or test or predict", required = False, default = 'train')
-    parser.add_argument("-save", type= bool,  help=" True to save the model", required = False, default = False)  
+    parser.add_argument("-save", type= bool,  help=" True to save the model", required = False, default = False)
+    parser.add_argument("-checkpoint", type= bool,  help=" True to use checkpoint", required = False, default = False)    
     pargs = parser.parse_args()     
     configuration_file = pargs.config
     configuration = conf.ConfigurationFile(configuration_file, pargs.name)                   
@@ -100,7 +101,7 @@ if __name__ == '__main__' :
     model(input_image)    
     model.summary()
     #use_checkpoints to load weights
-    if configuration.use_checkpoint() :                
+    if configuration.use_checkpoint() and pargs.checkpoint == True :                
         model.load_weights(configuration.get_checkpoint_file(), by_name = True, skip_mismatch = True)
         #model.load_weights(configuration.get_checkpoint_file(), by_name = False)
     #defining optimizer, my experience shows that SGD + cosine decay is a good starting point        
