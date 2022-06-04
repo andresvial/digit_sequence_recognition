@@ -22,12 +22,29 @@ import numpy as np
 import argparse
 import os
 
+def predict_amount(filename):
+  target_size = (configuration.get_image_height(), configuration.get_image_width())
+  image = imgproc.process_mnist(data.read_image(filename, configuration.get_number_of_channels()), target_size )
+  image = image - mean_image
+  image = tf.expand_dims(image, 0)        
+  pred = model.predict(image)
+  pred = pred[0][0]
+  total_amount = ""
+  for p in pred:
+      #softmax to estimate probs
+      p = np.exp(p - max(p))
+      p = p / np.sum(p)            
+      cla = np.argmax(p)
+      total_amount += str(cla)
+      #print('{} [{}]'.format(cla, p[cla]))
+  return total_amount
+
 if __name__ == '__main__' :        
     parser = argparse.ArgumentParser(description = "Train a simple mnist model")
     parser.add_argument("-config", type = str, help = "<str> configuration file", required = True)
     parser.add_argument("-name", type=str, help=" name of section in the configuration file", required = True)
     parser.add_argument("-mode", type=str, choices=['train', 'test', 'predict'],  help=" train or test or predict", required = False, default = 'train')
-    parser.add_argument("-save", type= bool,  help=" True to save the model", required = False, default = False)    
+    parser.add_argument("-save", type= bool,  help=" True to save the model", required = False, default = False)  
     pargs = parser.parse_args()     
     configuration_file = pargs.config
     configuration = conf.ConfigurationFile(configuration_file, pargs.name)                   
@@ -115,22 +132,37 @@ if __name__ == '__main__' :
     elif pargs.mode == 'predict' :
         filename = input('file :')
         while(filename != 'end') :
-            target_size = (configuration.get_image_height(), configuration.get_image_width())
-            image = imgproc.process_mnist(data.read_image(filename, configuration.get_number_of_channels()), target_size )
-            image = image - mean_image
-            image = tf.expand_dims(image, 0)        
-            pred = model.predict(image)
-            pred = pred[0][0]
-            total_amount = ""
-            for p in pred:
-                #softmax to estimate probs
-                p = np.exp(p - max(p))
-                p = p / np.sum(p)            
-                cla = np.argmax(p)
-                total_amount += str(cla)
-                print('{} [{}]'.format(cla, p[cla]))
-            print('Total amount {}'.format(total_amount))
+            r = predict_amount(filename)
+            print('Total amount {}'.format(r))
             filename = input('file :')
+
+    elif pargs.mode == 'accuracy' :
+        total_images = 0.0
+        corrects = 0.0
+
+        train_txt = open("train.txt", "r")
+        lines = train_txt.readlines()
+        for line in lines:
+            l = line.split("\t")
+            filename = l[0]
+            real_amount = l[1]
+            predicted_amount = predict_amount(filename)
+            if (real_amount == predicted_amount) :
+                corrects += 1
+            total_images += 1
+        train_txt.close()
+
+        test_txt = open("test.txt", "r")
+        lines = test_txt.readlines()
+        for line in lines:
+            l = line.split("\t")
+            filename = l[0]
+            real_amount = l[1]
+            predicted_amount = predict_amount(filename)
+            if (real_amount == predicted_amount) :
+                corrects += 1
+            total_images += 1
+        test_txt.close()
 
     #save the model   
     if pargs.save :
