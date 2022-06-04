@@ -140,18 +140,6 @@ if __name__ == '__main__' :
         total_images = 0.0
         corrects = 0.0
 
-        train_txt = open("/content/data/dataset/train.txt", "r")
-        lines = train_txt.readlines()
-        for line in lines:
-            l = line.split("\t")
-            filename = l[0]
-            real_amount = l[1]
-            predicted_amount = predict_amount(filename)
-            if (real_amount == predicted_amount) :
-                corrects += 1
-            total_images += 1
-        train_txt.close()
-
         test_txt = open("/content/data/dataset/test.txt", "r")
         lines = test_txt.readlines()
         for line in lines:
